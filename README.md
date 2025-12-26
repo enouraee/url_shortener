@@ -26,25 +26,6 @@ This project is part of a technical interview process and is designed to showcas
 
 ## 🚀 Getting Started
 
-### Quick Setup (Recommended)
-
-For automated setup, activate your virtual environment and run:
-
-```bash
-pyenv activate Shorakka  # or: source venv/bin/activate
-bash scripts/local_setup.sh
-```
-
-This will:
-1. Install all dependencies
-2. Create `.env` from `sample.env` (if needed)
-3. Verify configuration and database connectivity
-4. Run database migrations
-
----
-
-### Manual Setup
-
 ### 1. Clone the repo
 
 ```bash
@@ -52,89 +33,24 @@ git clone https://github.com/mahdimmr/url-shortener.git
 cd url-shortener
 ```
 
-### 2. Activate virtual environment & install dependencies
+### 2. Create virtual environment & install dependencies
 
-If using `pyenv`:
-```bash
-pyenv activate Shorakka
-pip install -r requirements.txt
-```
-
-Or create a new virtual environment:
 ```bash
 python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 pip install -r requirements.txt
 ```
 
-### 3. Setup environment variables
+### 3. Setup the database
 
-Copy `sample.env` to `.env` and configure for your local setup:
+> By default, it uses PostgreSQL, Look at in `sample.env` PG_DSN.
 
 ```bash
 cp sample.env .env
-```
-
-Example `.env` configuration for local development:
-```env
-ENV_SETTING=dev
-PG_DSN=postgresql+asyncpg://root:abcd%401234@127.0.0.1:5432/Shoraka
-DB_POOL_SIZE=5
-DB_MAX_OVERFLOW=10
-DB_POOL_PRE_PING=true
-DB_POOL_RECYCLE=3600
-DB_ECHO=true
-```
-
-**Important Notes:**
-- Use `postgresql+asyncpg://` driver for async operations
-- URL-encode special characters in password (e.g., `@` → `%40`, `#` → `%23`)
-- Ensure your PostgreSQL database exists before running migrations
-
-### 4. Verify your setup (Bootstrap Check)
-
-Run the automated bootstrap verification script to ensure everything is configured correctly:
-
-```bash
-python scripts/bootstrap_check.py
-```
-
-This will check:
-- ✓ Settings configuration loads properly
-- ✓ FastAPI app imports successfully
-- ✓ Database connectivity works
-
-**Expected output when successful:**
-```
-✓ All checks passed! Environment is ready.
-  You can now run: uvicorn app.main:app --reload
-```
-
-If any checks fail, the script will provide troubleshooting guidance.
-
-### 5. Run database migrations
-
-The project uses Alembic for database migrations. The schema includes three tables:
-- **`urls`**: Stores original URLs and short codes
-- **`url_visits`**: Tracks individual visits with IP and timestamp
-- **`url_daily_stats`**: Aggregated daily visit statistics per URL
-
-Create a new migration (if models changed):
-```bash
-alembic revision --autogenerate -m "description"
-```
-
-Apply migrations to database:
-```bash
 alembic upgrade head
 ```
 
-Check current migration status:
-```bash
-alembic current
-```
-
-### 6. Run the app
+### 4. Run the app
 
 ```bash
 uvicorn app.main:app --reload
