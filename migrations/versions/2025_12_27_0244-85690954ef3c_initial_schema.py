@@ -1,8 +1,8 @@
-"""init schema
+"""initial_schema
 
-Revision ID: 2ff99f48aeb2
+Revision ID: 85690954ef3c
 Revises: 
-Create Date: 2025-12-26 19:28:16.279459
+Create Date: 2025-12-27 02:44:02.132055
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel
 
 
 # revision identifiers, used by Alembic.
-revision = '2ff99f48aeb2'
+revision = '85690954ef3c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,7 @@ def upgrade() -> None:
     sa.Column('original_url', sa.Text(), nullable=False),
     sa.Column('short_code', sa.String(length=20), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('visit_count', sa.BigInteger(), server_default='0', nullable=False),
+    sa.Column('visit_count', sa.BigInteger(), server_default=sa.text('0'), nullable=False),
     sa.Column('last_visited_at', sa.DateTime(timezone=True), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
@@ -34,8 +34,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('url_id', sa.Integer(), nullable=False),
     sa.Column('day', sa.Date(), nullable=False),
-    sa.Column('count', sa.BigInteger(), server_default='0', nullable=False),
-    sa.ForeignKeyConstraint(['url_id'], ['urls.id'], ),
+    sa.Column('count', sa.BigInteger(), server_default=sa.text('0'), nullable=False),
+    sa.ForeignKeyConstraint(['url_id'], ['urls.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('url_id', 'day', name='uq_url_daily_stats_url_id_day')
     )
@@ -45,7 +45,7 @@ def upgrade() -> None:
     sa.Column('url_id', sa.Integer(), nullable=False),
     sa.Column('ip', sa.String(length=45), nullable=False),
     sa.Column('visited_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['url_id'], ['urls.id'], ),
+    sa.ForeignKeyConstraint(['url_id'], ['urls.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_url_visits_url_id_visited_at', 'url_visits', ['url_id', 'visited_at'], unique=False)

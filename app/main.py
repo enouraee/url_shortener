@@ -1,10 +1,18 @@
 from fastapi import FastAPI
-from app.api import endpoints
+
+from app.api import endpoints, health
 from app.middleware.logging import add_logging_middleware
 
-app = FastAPI()
 
+app = FastAPI(
+    title="URL Shortener API",
+    description="URL shortening service",
+    version="0.1.0"
+)
 
-app.include_router(endpoints.router)
+# Register routers
+app.include_router(health.router, tags=["health"])
+app.include_router(endpoints.router, tags=["urls"])
 
+# Add middleware
 add_logging_middleware(app)

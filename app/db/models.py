@@ -1,5 +1,3 @@
-"""Database models for URL Shortener."""
-
 from datetime import datetime, date
 from typing import Optional
 
@@ -21,7 +19,7 @@ from sqlmodel import SQLModel, Field
 
 
 class URL(SQLModel, table=True):
-    """Main URL table storing original URLs and their short codes."""
+    """Stores URLs and their short codes."""
 
     __tablename__ = "urls"
 
@@ -42,7 +40,7 @@ class URL(SQLModel, table=True):
 
 
 class URLVisit(SQLModel, table=True):
-    """Individual visit tracking for URLs."""
+    """Individual visit records."""
 
     __tablename__ = "url_visits"
 
@@ -59,7 +57,7 @@ class URLVisit(SQLModel, table=True):
 
 
 class URLDailyStat(SQLModel, table=True):
-    """Daily aggregated visit statistics per URL."""
+    """Daily visit counts per URL."""
 
     __tablename__ = "url_daily_stats"
 
