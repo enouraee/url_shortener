@@ -7,3 +7,4 @@ sqlalchemy
 alembic
 uvicorn
 pytest
+greenlet
