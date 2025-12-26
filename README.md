@@ -114,14 +114,24 @@ If any checks fail, the script will provide troubleshooting guidance.
 
 ### 5. Run database migrations
 
-Create initial migration:
+The project uses Alembic for database migrations. The schema includes three tables:
+- **`urls`**: Stores original URLs and short codes
+- **`url_visits`**: Tracks individual visits with IP and timestamp
+- **`url_daily_stats`**: Aggregated daily visit statistics per URL
+
+Create a new migration (if models changed):
 ```bash
-alembic revision --autogenerate -m "init"
+alembic revision --autogenerate -m "description"
 ```
 
-Apply migrations:
+Apply migrations to database:
 ```bash
 alembic upgrade head
+```
+
+Check current migration status:
+```bash
+alembic current
 ```
 
 ### 6. Run the app

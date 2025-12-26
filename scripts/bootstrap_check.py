@@ -60,8 +60,8 @@ def check_app_import():
         return False
 
 
-async def check_database_connectivity():
-    """Verify database connectivity with async engine."""
+async def check_database_connectivity_and_tables():
+    """Verify database connectivity and table existence."""
     print_section("3. Database Connectivity Check")
     try:
         from app.db.session import engine
@@ -70,6 +70,7 @@ async def check_database_connectivity():
         print(f"→ Attempting to connect to database...")
         
         async with engine.connect() as conn:
+            # Test basic connectivity
             result = await conn.execute(text("SELECT 1 as test"))
             row = result.fetchone()
             
@@ -82,10 +83,32 @@ async def check_database_connectivity():
                 version = version_result.fetchone()[0]
                 print(f"  - PostgreSQL version: {version.split(',')[0]}")
                 
-                return True
+                # Now check for tables
+                print_section("4. Database Schema Check")
+                required_tables = ["urls", "url_visits", "url_daily_stats"]
+                
+                print(f"→ Checking for required tables...")
+                
+                result = await conn.execute(text(
+                    "SELECT tablename FROM pg_tables WHERE schemaname = 'public'"
+                ))
+                existing_tables = [row[0] for row in result.fetchall()]
+                
+                missing_tables = [t for t in required_tables if t not in existing_tables]
+                
+                if not missing_tables:
+                    print(f"✓ All required tables exist")
+                    for table in required_tables:
+                        print(f"  - {table}")
+                    return True, True
+                else:
+                    print(f"✗ Missing tables: {', '.join(missing_tables)}")
+                    print(f"\nTo create tables, run:")
+                    print(f"  alembic upgrade head")
+                    return True, False
             else:
                 print(f"✗ Database connectivity failed: unexpected result")
-                return False
+                return False, False
                 
     except Exception as e:
         print(f"✗ Database connectivity failed: {e}")
@@ -94,7 +117,7 @@ async def check_database_connectivity():
         print(f"  2. Verify database 'Shoraka' exists")
         print(f"  3. Check credentials in .env file")
         print(f"  4. Confirm password is URL-encoded in PG_DSN")
-        return False
+        return False, False
 
 
 def main():
@@ -111,9 +134,10 @@ def main():
     # Check 2: App Import
     results.append(check_app_import())
     
-    # Check 3: Database Connectivity (async)
-    db_check_result = asyncio.run(check_database_connectivity())
+    # Check 3 & 4: Database Connectivity and Tables (async, combined)
+    db_check_result, tables_check_result = asyncio.run(check_database_connectivity_and_tables())
     results.append(db_check_result)
+    results.append(tables_check_result)
     
     # Summary
     print_section("Summary")
